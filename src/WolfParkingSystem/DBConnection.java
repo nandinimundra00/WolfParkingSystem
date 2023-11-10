@@ -25,10 +25,11 @@ public class DBConnection {
     }
 
     public static void close() {
-        try {
+       try {
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
+       }
+
+}
 }

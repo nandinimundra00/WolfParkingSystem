@@ -1,5 +1,5 @@
 package WolfParkingSystem;
-
+import java.sql.SQLException;
 import java.util.Scanner;
 import WolfParkingSystem.Menu.*;
 import WolfParkingSystem.DBConnection;
@@ -28,7 +28,7 @@ public class WolfParkingSystemMain {
                 case 2:
                     System.out.println("You selected Maintaining permits and vehicle information for each driver");
                     MaintainingMetadata mm = new MaintainingMetadata();
-                    
+                    mm.operations();                
                     break;
                 case 3:
                     System.out.println("You selected Generating and maintaining citations");
@@ -40,7 +40,12 @@ public class WolfParkingSystemMain {
                     break;
                 case 5:
                     System.out.println("Goodbye!");
-                    DBConnection.close();
+//		            try {
+//		            	DBConnection.connection.close();
+//		            } catch (SQLException e) {
+//		                e.printStackTrace();
+//		            }
+                  DBConnection.close();
                     quit = true;
                     break;
                 default:

@@ -2,9 +2,12 @@ package WolfParkingSystem.Menu;
 
 import java.util.Scanner;
 import java.sql.SQLException;
+import java.sql.Date;
+import java.sql.Time;
 
 import WolfParkingSystem.APIs.*;
 import WolfParkingSystem.Classes.*;
+import WolfParkingSystem.DBConnection;
 
 public class InformationProcessing {
 	
@@ -20,6 +23,8 @@ public class InformationProcessing {
         VehicleAPI v = null; 
         ZoneAPI z = null; 
         SpaceAPI s = null;
+        PermitAPI p = null;
+        CitationAPI c = null;
         while (!quit) {
             System.out.println("Select an option:");
             System.out.println("1) Add driver info");
@@ -300,17 +305,20 @@ public class InformationProcessing {
                     break;
                     
                 case 11:
-                	
-                	//need to add checks here
+
                     System.out.println("You selected Update space");
                     System.out.print("Enter Space Number to update: ");
+                    int oldSpaceNumber = scanner.nextInt();
+
+                    System.out.print("Enter Zone ID: ");
+                    String oldSpaceZoneID = scanner.next();
+
+                    System.out.print("Enter Parking Lot ID: ");
+                    int oldSpaceLotID = scanner.nextInt(); 
+                    
+                    System.out.print("Enter new Space Number to update: ");
                     int spaceNumberToUpdate = scanner.nextInt();
 
-                    System.out.print("Enter New Zone ID: ");
-                    String newSpaceZoneID = scanner.next();
-
-                    System.out.print("Enter New Parking Lot ID: ");
-                    int newSpaceLotID = scanner.nextInt();
 
                     System.out.print("Enter New Space Type: ");
                     String newSpaceType = scanner.next();
@@ -320,9 +328,8 @@ public class InformationProcessing {
 
                     try {
                         SpaceAPI spaceAPI = new SpaceAPI();
-                        Space updatedSpace = new Space(spaceNumberToUpdate, newSpaceZoneID, newSpaceLotID, newSpaceType, newAvailabilityStatus);
 
-                        boolean success = spaceAPI.updateSpace(updatedSpace);
+                        boolean success = spaceAPI.updateSpace(oldSpaceNumber, oldSpaceZoneID, oldSpaceLotID, spaceNumberToUpdate, newSpaceType, newAvailabilityStatus);
 
                         if (success) {
                             System.out.println("Space updated successfully.");
@@ -359,24 +366,142 @@ public class InformationProcessing {
                     break;
                 case 13:
                     System.out.println("You selected Add permit info");
-                    // Implement your code for adding permit information here
+                    
+                    System.out.print("Enter Permit Type: ");
+                    String permitType = scanner.next();
+                    
+                    System.out.print("Enter Expiration Date (YYYY-MM-DD): ");
+                    String expirationDateString = scanner.next();
+                    
+                    System.out.print("Enter Expiration Time (HH:MM:SS): ");
+                    String expirationTimeString = scanner.next();
+                    
+                    System.out.print("Enter Start Date (YYYY-MM-DD): ");
+                    String startDateString = scanner.next();
+                    
+                    System.out.print("Enter Space Type: ");
+                    String spacePermitType = scanner.next();
+                    
+                    try {
+                        p = new PermitAPI();                      
+                        Date expirationDate = Date.valueOf(expirationDateString);
+                        Time expirationTime = Time.valueOf(expirationTimeString);
+                        Date startDate = Date.valueOf(startDateString);
+                        
+                        boolean success = p.insertPermit(permitType, expirationDate, expirationTime, startDate, spacePermitType);
+                        
+                        if (success) {
+                            System.out.println("Permit information added successfully.");
+                        } else {
+                            System.out.println("Failed to add permit information. Please try again.");
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                     break;
+
                 case 14:
-                    System.out.println("You selected Update permit info");
-                    // Implement your code for updating permit information here
+                    System.out.println("You selected Update permit info");                                  
+                    try {
+                        p = new PermitAPI();
+//                        Permit existingPermit = p.getPermitById(permitIDToUpdate);
+//                        System.out.println(existingPermit);
+//                        if (existingPermit == null) {
+//                            System.out.println("Permit with Permit ID " + permitIDToUpdate + " does not exist.");
+//                        } else {
+                        System.out.println("Enter the permit ID");
+                        Integer permitID = scanner.nextInt();
+                        
+                    	System.out.print("Enter New Permit Type: ");
+                        String newPermitType = scanner.next();
+
+                        System.out.print("Enter New Expiration Date (YYYY-MM-DD): ");
+                        String newExpirationDateStr = scanner.next();
+                        Date newExpirationDate = Date.valueOf(newExpirationDateStr);
+
+                        System.out.print("Enter New Expiration Time (HH:MM:SS): ");
+                        String newExpirationTimeStr = scanner.next();
+                        Time newExpirationTime = Time.valueOf(newExpirationTimeStr);
+
+                        System.out.print("Enter New Start Date (YYYY-MM-DD): ");
+                        String newStartDateStr = scanner.next();
+                        Date newStartDate = Date.valueOf(newStartDateStr);
+
+                        System.out.print("Enter New Space Permit Type: ");
+                        String newSpacePermitType = scanner.next();
+
+                        boolean success = p.updatePermit(
+                        		permitID,
+                                newPermitType,
+                                newExpirationDate,
+                                newExpirationTime,
+                                newStartDate,
+                                newSpacePermitType);
+
+                        if (success) {
+                            System.out.println("Permit updated successfully.");
+                        } else {
+                            System.out.println("Failed to update permit. Please try again.");
+                        }                       
+
+                    } catch (SQLException e) {
+                    	e.printStackTrace();
+                    }
                     break;
+
                 case 15:
                     System.out.println("You selected Delete permit info");
-                    // Implement your code for deleting permit information here
+                    p = new PermitAPI();
+                    System.out.println("Enter permit ID to be deleted");
+                    Integer permitIDToDelete = scanner.nextInt();
+                    try {
+                    	boolean deletePermit = p.deletePermit(permitIDToDelete);
+                    	if (deletePermit) {
+                    		System.out.println("Permit deleted successfully");
+                    	} else {
+                    		System.out.println("Could not delete permit");
+                    	}
+                    } catch (SQLException e){
+                    	e.printStackTrace();
+                    }
                     break;
                 case 16:
                     System.out.println("You selected Appeal a citation");
-                    // Implement your code for appealing a citation here
+                    System.out.print("Enter Citation Number to appeal: ");
+                    int citationNumberToAppeal = scanner.nextInt();
+                    try {
+                        c = new CitationAPI();
+                        boolean success = c.appealCitation(citationNumberToAppeal);
+
+                        if (success) {
+                        	System.out.println("Citation applealed successfully");
+                        } else {
+                            System.out.println("Failed to appeal citation. Please try again.");
+                        }
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                     break;
+
                 case 17:
                     System.out.println("You selected Update Citation Payment status");
-                    // Implement your code for updating citation payment status here
+                    System.out.print("Enter Citation Number to update the payment status of: ");
+                    int citationNumberToUpdate = scanner.nextInt();
+                    try {
+                    	c = new CitationAPI();
+                    	boolean success = c.updateCitationPaymentStatus(citationNumberToUpdate);
+                        if (success) {
+                        	System.out.println("Citation payment status updated successfully");
+                        } else {
+                            System.out.println("Failed to update citation payment status. Please try again.");
+                        }
+                    	
+                    } catch (SQLException e) {
+                    	e.printStackTrace();
+                    }
                     break;
+                    
                 case 18:
                     System.out.println("Goodbye!");
                     quit = true;

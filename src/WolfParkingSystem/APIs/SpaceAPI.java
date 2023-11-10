@@ -77,19 +77,18 @@ public class SpaceAPI {
         }
     }
     // Update space in the database
-    public boolean updateSpace(Space space) throws SQLException {
-        String sql = "UPDATE Space SET SpaceNumber = ?, ZoneID = ?, LotID = ?, SpaceType = ?, AvailabilityStatus = ? WHERE SpaceNumber = ? AND ZoneID = ? AND LotID = ?";
+    public boolean updateSpace(int oldSpaceNumber, String oldSpaceZoneID, int oldSpaceLotID, int spaceNumberToUpdate, String newSpaceType, boolean newAvailabilityStatus) throws SQLException {
+        String sql = "UPDATE Space SET SpaceNumber = ?, SpaceType = ?, AvailabilityStatus = ? WHERE SpaceNumber = ? AND ZoneID = ? AND LotID = ?";
         Connection connection = DBConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-        	statement.setInt(1, space.getSpaceNumber());
-            statement.setString(2, space.getZoneID());
-            statement.setInt(3, space.getLotID());
-            statement.setString(4, space.getSpaceType());
-            statement.setBoolean(5, space.isAvailabilityStatus());
-            statement.setInt(6, space.getSpaceNumber());
-            statement.setString(7, space.getZoneID());
-            statement.setInt(8, space.getLotID());
+        	statement.setInt(1, spaceNumberToUpdate);
+            statement.setString(2, newSpaceType);
+            statement.setBoolean(3, newAvailabilityStatus);
+            statement.setInt(4, oldSpaceNumber);
+            statement.setString(5, oldSpaceZoneID);
+            statement.setInt(6, oldSpaceLotID);
+            
 
             int rowsAffected = statement.executeUpdate();
             return rowsAffected == 1;
